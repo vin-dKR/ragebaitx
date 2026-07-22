@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Single-row app configuration. id is always 1.
+model Setting {
+  id          Int      @id @default(1)
+  interests   String   @default("[]") // JSON array of topic strings the user cares about
+  autoMode    Boolean  @default(false) // true = autonomous posting; false = approval queue
+  minVirality Int      @default(72) // 0-100 threshold for auto-posting
+  minSafety   Int      @default(80) // 0-100 brand-safety floor (applies to auto AND queue)
+  perRunLimit Int      @default(20) // max candidate tweets scored per pipeline run
+  updatedAt   DateTime @updatedAt
+}
+
+// An X account you follow and want the bot to monitor for viral posts.
+model Source {
+  id        String   @id @default(cuid())
+  handle    String   @unique // without the leading @
+  xUserId   String? // resolved + cached numeric id
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+// A candidate post the bot found, scored, and (maybe) published.
+model Draft {
+  id            String   @id @default(cuid())
+  sourceTweetId String   @unique
+  sourceHandle  String
+  sourceText    String
+  heading       String // Claude-generated headline in the user's voice
+  mediaType     String? // "photo" | "video" | "gif" | null
+  mediaUrl      String? // best downloadable media URL from the source tweet
+  thumbUrl      String? // preview image for the dashboard
+  viralityScore Int
+  safetyScore   Int
+  faithful      Boolean  @default(true) // heading stays factually true to the source
+  reasoning     String
+  velocity      Float    @default(0) // (likes + reposts) per hour since posted
+  status        String   @default("pending") // pending | approved | rejected | posted | failed
+  postedTweetId String?
+  error         String?
+  createdAt     DateTime @default(now())
+}
