@@ -1,32 +1,29 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import "./globals.css";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
+import { cn } from "@/lib/utils";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
-  title: "ragebaitx — news autoposter",
-  description: "AI-assisted news curation & posting for a single X account",
+  title: "Ragebaitx — Mission Control",
+  description:
+    "AI-assisted news curation, drafting & posting for a single X account",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en">
-      <body>
-        <div className="mx-auto max-w-3xl px-4 py-6">
-          <header className="mb-8 flex items-center justify-between border-b border-neutral-800 pb-4">
-            <Link href="/" className="text-lg font-bold tracking-tight">
-              ragebait<span className="text-sky-400">x</span>
-            </Link>
-            <nav className="flex gap-4 text-sm text-neutral-400">
-              <Link href="/" className="hover:text-neutral-100">
-                Queue
-              </Link>
-              <Link href="/settings" className="hover:text-neutral-100">
-                Settings
-              </Link>
-            </nav>
-          </header>
-          {children}
-        </div>
+    <html
+      lang="en"
+      className={cn("dark", GeistSans.variable, GeistMono.variable)}
+    >
+      <body className="antialiased">
+        {children}
+        <Toaster position="bottom-right" />
       </body>
     </html>
   );
